@@ -125,5 +125,5 @@ pub fn create_boundary_widget() -> impl Widget<State> {
                 .lens(RoofBoundaryTupleLens{})
         )
         .main_axis_alignment(MainAxisAlignment::End)
-        .fix_width(330.0)
+        .fix_width(340.0)
 }

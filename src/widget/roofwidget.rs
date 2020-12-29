@@ -97,5 +97,5 @@ pub fn create_roof_widget() -> impl Widget<Roof> {
         .with_default_spacer()
         .with_child(SizedBox::new(RoofGraphics {}).width(120.0).height(80.0))
         .main_axis_alignment(MainAxisAlignment::End)
-        .fix_width(330.0)
+        .fix_width(340.0)
 }

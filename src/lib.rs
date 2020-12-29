@@ -90,7 +90,7 @@ fn build_app() -> impl Widget<State> {
                         )
                 )
                     .vertical()
-                    .fix_width(333.0)
+                    .fix_width(343.0)
             )
         )
         .with_flex_child(

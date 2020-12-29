@@ -10,5 +10,5 @@ pub fn create_constraints_widget() -> impl Widget<Constraints> {
         .with_default_spacer()
         .with_child(Checkbox::new("Transboundary").lens(Constraints::transboundary))
         .cross_axis_alignment(CrossAxisAlignment::Start)
-        .fix_width(330.0)
+        .fix_width(340.0)
 }
