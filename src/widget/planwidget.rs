@@ -1,9 +1,8 @@
-use druid::{BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, RenderContext, Color, WidgetExt, theme};
+use druid::{BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, RenderContext, Color, WidgetExt, theme, UnitPoint};
 
 use crate::model::plan::Plan;
 use crate::widget::boundarywidget::BoundaryGraphics;
 use druid::widget::{Scroll, Flex, Label, List};
-use crate::lens::planresultlens::PlanResultLens;
 use druid::im::Vector;
 
 pub struct PlanGraphics {
@@ -51,21 +50,19 @@ impl Widget<Plan> for PlanGraphics {
 
     fn paint(&mut self, ctx: &mut PaintCtx, plan: &Plan, env: &Env) {
         let size = ctx.size();
-
-        log::info!("Size: {}", size);
         let scale = plan.get_roof().scale(size);
 
         self.boundary_graphics.paint(ctx, &(plan.get_roof(), plan.get_boundary()), env);
 
         let roof = plan.get_roof().scaled(scale);
         let boundary = plan.get_boundary().scaled(scale);
-        let panel = plan.get_panel().scaled(scale);
+        let panel = plan.get_panels().scaled(scale);
         let clearance = plan.get_clearance().scaled(scale);
 
         let panel_shape = panel.shape();
         let start_y = (size.height - roof.get_height()) * 0.5 + roof.get_height() - boundary.get_bottom() - panel.get_height();
 
-        for (row, cols) in plan.get_layout().get_rows().iter().rev().map(|row| *row as f64).enumerate() {
+        for (row, cols) in plan.get_layout().iter().rev().map(|row| *row as f64).enumerate() {
             let width = cols * panel.get_width() + (cols - 1.0) * clearance.get_vertical();
             let start_x = (size.width - width + roof.horizontal_shift(boundary)) * 0.5;
             for col in 0..cols as i32 {
@@ -85,8 +82,13 @@ impl Widget<Plan> for PlanGraphics {
 pub fn plan() -> impl Widget<Plan> {
     Flex::column()
         .with_child(
-            Label::raw()
-                .lens(PlanResultLens{})
+            Label::new(|plan: &Plan, _env: &_|
+                format!(
+                    "{} x {} (Area = {:.2}m²; DC power = {:.1}KWp)",
+                    plan.get_total_panels(), plan.get_panels().get_name(), plan.get_total_area(),
+                    plan.get_total_dc_power() / 1000.0
+                )
+            )
                 .background(theme::PLACEHOLDER_COLOR)
                 .expand_width()
         )
@@ -99,6 +101,6 @@ pub fn plan() -> impl Widget<Plan> {
 }
 
 pub fn create_plan_widget() -> impl Widget<Vector<Plan>> {
-    Scroll::new(List::new(|| plan())).vertical()
+    Scroll::new(List::new(|| plan())).vertical().align_vertical(UnitPoint::TOP_LEFT)
 }
 

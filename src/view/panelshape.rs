@@ -13,7 +13,7 @@ impl Panel {
     }
 
     pub fn scaled(&self, scale: f64) -> Self {
-        Self::new(self.get_width() * scale, self.get_height() * scale, self.get_peak_power())
+        Self::new(self.get_name(), self.get_width() * scale, self.get_height() * scale, self.get_peak_power())
     }
 
     pub fn scaled_to_size(&self, size: Size) -> Self {

@@ -1,20 +1,22 @@
 use druid::{Data, Lens};
 use crate::model::orientation::Orientation;
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens)]
+#[derive(Clone, PartialEq, PartialOrd, Data, Lens)]
 pub struct Panel {
+    name: String,
     width: f64,
     height: f64,
     peak_power: f64,
-}
-
-impl Eq for Panel {
-
+    selected: bool,
 }
 
 impl Panel {
-    pub fn new(width: f64, height: f64, peak_power: f64) -> Self {
-        Panel { width, height, peak_power }
+    pub fn new(name: &str, width: f64, height: f64, peak_power: f64) -> Self {
+        Panel { name: name.to_string(), width, height, peak_power, selected: false }
+    }
+
+    pub fn get_name(&self) -> &str {
+        &self.name
     }
 
     pub fn get_width(&self) -> f64 {
@@ -29,6 +31,14 @@ impl Panel {
         self.peak_power
     }
 
+    pub fn is_selected(&self) -> bool {
+        self.selected
+    }
+
+    pub fn set_name(&mut self, name: &str) {
+        self.name = name.to_string();
+    }
+
     pub fn set_width(&mut self, width: f64) {
         self.width = width;
     }
@@ -39,6 +49,10 @@ impl Panel {
 
     pub fn set_peak_power(&mut self, peak_power: f64) {
         self.peak_power = peak_power;
+    }
+
+    pub fn set_selected(&mut self, selected: bool) {
+        self.selected = selected;
     }
 
     pub fn is_rectangle(&self) -> bool {
@@ -71,7 +85,7 @@ impl Panel {
     }
 
     pub fn transposed(&self) -> Self {
-        Self::new(self.height, self.width, self.peak_power)
+        Self::new(self.name.as_str(), self.height, self.width, self.peak_power)
     }
 
     pub fn as_portrait(&self) -> Self {

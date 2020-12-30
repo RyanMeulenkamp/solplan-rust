@@ -2,8 +2,8 @@ use druid::{
     Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints,
     LayoutCtx, Size, PaintCtx, Color, RenderContext
 };
-use druid::widget::{Flex, Label, TextBox, SizedBox, MainAxisAlignment};
-use crate::format::distance::SiFormatter;
+use druid::widget::{Flex, Label, TextBox, MainAxisAlignment};
+use crate::format::siformatter::SiFormatter;
 use crate::model::clearance::Clearance;
 
 struct ClearanceGraphics;
@@ -50,7 +50,7 @@ impl Widget<Clearance> for ClearanceGraphics {
     }
 }
 
-pub fn create_clearance_forms_widget() -> impl Widget<Clearance> {
+fn create_clearance_forms_widget() -> impl Widget<Clearance> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(
@@ -82,7 +82,7 @@ pub fn create_clearance_widget() -> impl Widget<Clearance> {
     Flex::row()
         .with_child(create_clearance_forms_widget())
         .with_default_spacer()
-        .with_child(SizedBox::new(ClearanceGraphics {}).width(120.0).height(80.0))
+        .with_child(ClearanceGraphics {}.fix_size(120.0, 80.0))
         .main_axis_alignment(MainAxisAlignment::End)
         .fix_width(340.0)
 }

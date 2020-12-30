@@ -1,7 +1,7 @@
 use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, Affine};
 use crate::model::roof::Roof;
-use druid::widget::{Flex, Label, TextBox, SizedBox, MainAxisAlignment};
-use crate::format::distance::SiFormatter;
+use druid::widget::{Flex, Label, TextBox, MainAxisAlignment};
+use crate::format::siformatter::SiFormatter;
 
 struct RoofGraphics;
 
@@ -51,7 +51,7 @@ impl Widget<Roof> for RoofGraphics {
     }
 }
 
-pub fn create_roof_forms_widget() -> impl Widget<Roof> {
+fn create_roof_forms_widget() -> impl Widget<Roof> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(
@@ -95,7 +95,7 @@ pub fn create_roof_widget() -> impl Widget<Roof> {
     Flex::row()
         .with_child(create_roof_forms_widget())
         .with_default_spacer()
-        .with_child(SizedBox::new(RoofGraphics {}).width(120.0).height(80.0))
+        .with_child(RoofGraphics {}.fix_size(120.0, 80.0))
         .main_axis_alignment(MainAxisAlignment::End)
         .fix_width(340.0)
 }

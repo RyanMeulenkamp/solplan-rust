@@ -2,7 +2,7 @@ use druid::{Data, Lens};
 use druid::im::Vector;
 use crate::model::orientation::Orientation;
 use crate::algorithm::algorithm::Algorithm;
-use std::iter::FromIterator;
+use crate::algorithm::algorithm::{Rasterized, Staggered};
 
 #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Data, Lens)]
 pub struct Constraints {
@@ -51,11 +51,12 @@ impl Constraints {
         orientations
     }
 
-    pub fn get_algorithms(self) -> Vector<Algorithm> {
+    pub fn get_algorithms(self) -> Vec<Box<dyn Algorithm>> {
+        let mut vector: Vec<Box<dyn Algorithm>> = Vec::new();
+        vector.push(Box::new(Rasterized {}));
         if self.transboundary {
-            Vector::from_iter(vec![Algorithm::Rasterized, Algorithm::Staggered])
-        } else {
-            Vector::from_iter(vec![Algorithm::Rasterized])
+            vector.push(Box::new(Staggered {}));
         }
+        vector
     }
 }

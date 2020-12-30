@@ -1,13 +1,10 @@
-use druid::{
-    Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints,
-    LayoutCtx, Size, PaintCtx, Color, RenderContext, Affine, Point
-};
+use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, Affine, Point, LensExt};
 use crate::model::roof::Roof;
-use druid::widget::{Flex, Label, TextBox, SizedBox, MainAxisAlignment};
-use crate::format::distance::SiFormatter;
+use druid::widget::{Flex, Label, TextBox, MainAxisAlignment};
+use crate::format::siformatter::SiFormatter;
 use crate::model::boundary::Boundary;
 use crate::model::state::State;
-use crate::lens::roofboundarytuplelens::RoofBoundaryTupleLens;
+use druid::lens::Identity;
 
 pub struct BoundaryGraphics;
 
@@ -70,7 +67,7 @@ impl Widget<(Roof, Boundary)> for BoundaryGraphics {
     }
 }
 
-pub fn create_boundary_forms_widget() -> impl Widget<Boundary> {
+fn create_boundary_forms_widget() -> impl Widget<Boundary> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(
@@ -119,10 +116,12 @@ pub fn create_boundary_widget() -> impl Widget<State> {
         .with_child(create_boundary_forms_widget().lens(State::boundary))
         .with_default_spacer()
         .with_child(
-            SizedBox::new(BoundaryGraphics {})
-                .width(120.0)
-                .height(80.0)
-                .lens(RoofBoundaryTupleLens{})
+            BoundaryGraphics {}
+                .fix_size(120.0, 80.0)
+                .lens(Identity.map(
+                    |state: &State| (state.get_roof(), state.get_boundary()),
+                    |_: &mut State, _: (Roof, Boundary)| ()
+                ))
         )
         .main_axis_alignment(MainAxisAlignment::End)
         .fix_width(340.0)

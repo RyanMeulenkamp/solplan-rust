@@ -1,12 +1,11 @@
 use druid::{Data, Lens};
 
-use crate::model::layout::Layout;
 use crate::model::roof::Roof;
 use crate::model::boundary::Boundary;
 use crate::model::panel::Panel;
 use crate::model::clearance::Clearance;
-use crate::algorithm::algorithm::Algorithm;
 use std::cmp::Ordering;
+use druid::im::Vector;
 
 #[derive(Clone, PartialEq, Data, Lens)]
 pub struct Plan {
@@ -14,13 +13,12 @@ pub struct Plan {
     boundary: Boundary,
     panel: Panel,
     clearance: Clearance,
-    layout: Layout,
-    algorithm: Algorithm,
+    layout: Vector<i32>,
 }
 
 impl PartialOrd for Plan {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(other.get_total_panels().cmp(&self.get_total_panels()))
+        other.get_total_dc_power().partial_cmp(&self.get_total_dc_power())
     }
 }
 
@@ -36,10 +34,9 @@ impl Ord for Plan {
 
 impl Plan {
     pub fn new(
-        roof: Roof, boundary: Boundary, panel: Panel, clearance: Clearance, layout: Layout,
-        algorithm: Algorithm
+        roof: Roof, boundary: Boundary, panel: Panel, clearance: Clearance, layout: Vector<i32>,
     ) -> Plan {
-        Plan { roof, boundary, panel, clearance, algorithm, layout }
+        Plan { roof, boundary, panel, clearance, layout }
     }
 
     pub fn set_roof(&mut self, roof: Roof) {
@@ -58,11 +55,7 @@ impl Plan {
         self.clearance = clearance;
     }
 
-    pub fn set_algorithm(&mut self, algorithm: Algorithm) {
-        self.algorithm = algorithm;
-    }
-
-    pub fn set_layout(&mut self, layout: Layout) {
+    pub fn set_layout(&mut self, layout: Vector<i32>) {
         self.layout = layout;
     }
 
@@ -74,24 +67,20 @@ impl Plan {
         self.boundary
     }
 
-    pub fn get_panel(&self) -> Panel {
-        self.panel
+    pub fn get_panels(&self) -> Panel {
+        self.panel.clone()
     }
 
     pub fn get_clearance(&self) -> Clearance {
         self.clearance
     }
 
-    pub fn get_algorithm(&self) -> Algorithm {
-        self.algorithm
-    }
-
-    pub fn get_layout(&self) -> Layout {
+    pub fn get_layout(&self) -> Vector<i32> {
         self.layout.clone()
     }
 
     pub fn get_total_panels(&self) -> i32 {
-        self.get_layout().get_rows().iter().map(|row| row.clone() as i32).sum()
+        self.get_layout().iter().map(|row| row.clone() as i32).sum()
     }
 
     pub fn get_total_area(&self) -> f64 {
@@ -102,16 +91,16 @@ impl Plan {
         self.get_total_panels() as f64 * self.panel.get_peak_power()
     }
 
-    pub fn height(&self) -> f64 {
-        let rows = self.get_layout().get_rows().len() as f64;
-        rows * self.panel.get_height() + (rows - 1.0) * self.clearance.get_horizontal()
+    fn distance(amount: i32, panel: f64, clearance: f64) -> f64 {
+        let amount = amount as f64;
+        amount * panel + (amount - 1.0) * clearance
     }
 
-    pub fn width_at(&self, row: i32) -> f64 {
-        self.layout.clone().get_rows()
-            .get(row as usize)
-            .map_or(0.0, |width| {
-                *width as f64 * self.panel.get_width() + (*width - 1) as f64 * self.clearance.get_vertical()
-            })
+    pub fn height(&self) -> f64 {
+        Plan::distance(self.get_layout().len() as i32, self.panel.get_height(), self.clearance.get_horizontal())
+    }
+
+    pub fn width_at(&self, row: usize) -> f64 {
+        Plan::distance(self.layout[row], self.panel.get_width(), self.clearance.get_vertical())
     }
 }

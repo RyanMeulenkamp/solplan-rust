@@ -1,10 +1,10 @@
-use druid::{
-    Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints,
-    LayoutCtx, Size, PaintCtx, Color, RenderContext
-};
-use druid::widget::{Flex, Label, TextBox, SizedBox, MainAxisAlignment};
-use crate::format::distance::SiFormatter;
+use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, theme};
+use druid::widget::{Flex, Label, TextBox, Scroll, List, Button, Checkbox};
+use crate::format::siformatter::SiFormatter;
 use crate::model::panel::Panel;
+use druid::widget::CrossAxisAlignment::Baseline;
+use druid::im::Vector;
+use crate::model::state::State;
 
 struct PanelGraphics;
 
@@ -53,12 +53,12 @@ impl Widget<Panel> for PanelGraphics {
     }
 }
 
-pub fn create_panel_forms_widget() -> impl Widget<Panel> {
+fn create_panel_forms_widget() -> impl Widget<Panel> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
         .with_child(
             Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
+                .cross_axis_alignment(Baseline)
                 .with_child(Label::new("Width"))
                 .with_default_spacer()
                 .with_child(
@@ -70,7 +70,7 @@ pub fn create_panel_forms_widget() -> impl Widget<Panel> {
         .with_default_spacer()
         .with_child(
             Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
+                .cross_axis_alignment(Baseline)
                 .with_child(Label::new("Height"))
                 .with_default_spacer()
                 .with_child(
@@ -82,7 +82,7 @@ pub fn create_panel_forms_widget() -> impl Widget<Panel> {
         .with_default_spacer()
         .with_child(
             Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
+                .cross_axis_alignment(Baseline)
                 .with_child(Label::new("Power"))
                 .with_default_spacer()
                 .with_child(
@@ -93,11 +93,70 @@ pub fn create_panel_forms_widget() -> impl Widget<Panel> {
         )
 }
 
-pub fn create_panel_widget() -> impl Widget<Panel> {
-    Flex::row()
-        .with_child(create_panel_forms_widget())
+fn create_single_panel_widget() -> impl Widget<Panel> {
+    Flex::column()
         .with_default_spacer()
-        .with_child(SizedBox::new(PanelGraphics {}).width(120.0).height(80.0))
-        .main_axis_alignment(MainAxisAlignment::End)
+        .with_child(
+            Flex::row()
+                .with_child(Label::new("Type"))
+                .with_default_spacer()
+                .with_child(
+                    TextBox::new()
+                        .fix_width(218.0)
+                        .lens(Panel::name)
+                )
+                .with_default_spacer()
+                .with_child(
+                    Checkbox::new("")
+                        .lens(Panel::selected)
+                )
+                .align_right()
+
+        )
+        .with_default_spacer()
+        .with_child(
+            Flex::row()
+                .with_child(create_panel_forms_widget())
+                .with_default_spacer()
+                .with_child(PanelGraphics {}.fix_size(120.0, 80.0))
+        )
+        .with_default_spacer()
+        .border(theme::PLACEHOLDER_COLOR, 0.5)
         .fix_width(340.0)
+}
+
+pub fn create_add_remove_widget() -> impl Widget<State> {
+    Flex::row()
+        .with_flex_child(
+            Button::new("Add")
+                .on_click(|_ctx, data: &mut State, _env| {
+                    let mut panels = data.get_panels().clone();
+                    panels.insert(0, Panel::new(
+                        "type", 1684.0, 1002.0, 335.0
+                    ));
+                    data.set_panels(panels);
+                }),
+            1.0
+        )
+        .with_flex_child(
+            Button::new("Del")
+                .on_click(|_ctx, data: &mut State, _env| {
+                    let mut new_data: Vector<Panel> = Vector::new();
+                    for panel in data.get_panels().iter() {
+                        if !panel.is_selected() {
+                            new_data.push_back(panel.clone());
+                        }
+                    }
+                    data.set_panels(new_data);
+                })
+            ,
+            1.0
+        )
+}
+
+pub fn create_panels_widget() -> impl Widget<Vector<Panel>> {
+    Scroll::new(List::new(|| create_single_panel_widget()))
+        .vertical()
+        .fix_width(340.0)
+        .expand_height()
 }
