@@ -7,12 +7,13 @@ pub struct Panel {
     width: f64,
     height: f64,
     peak_power: f64,
+    price: f64,
     selected: bool,
 }
 
 impl Panel {
-    pub fn new(name: &str, width: f64, height: f64, peak_power: f64) -> Self {
-        Panel { name: name.to_string(), width, height, peak_power, selected: false }
+    pub fn new(name: &str, width: f64, height: f64, peak_power: f64, price: f64) -> Self {
+        Panel { name: name.to_string(), width, height, peak_power, price, selected: false }
     }
 
     pub fn get_name(&self) -> &str {
@@ -29,6 +30,10 @@ impl Panel {
 
     pub fn get_peak_power(&self) -> f64 {
         self.peak_power
+    }
+
+    pub fn get_price(&self) -> f64 {
+        self.price
     }
 
     pub fn is_selected(&self) -> bool {
@@ -49,6 +54,10 @@ impl Panel {
 
     pub fn set_peak_power(&mut self, peak_power: f64) {
         self.peak_power = peak_power;
+    }
+
+    pub fn set_price(&mut self, price: f64) {
+        self.price = price;
     }
 
     pub fn set_selected(&mut self, selected: bool) {
@@ -85,7 +94,7 @@ impl Panel {
     }
 
     pub fn transposed(&self) -> Self {
-        Self::new(self.name.as_str(), self.height, self.width, self.peak_power)
+        Self::new(self.name.as_str(), self.height, self.width, self.peak_power, self.price)
     }
 
     pub fn as_portrait(&self) -> Self {

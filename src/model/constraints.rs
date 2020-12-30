@@ -4,16 +4,17 @@ use crate::model::orientation::Orientation;
 use crate::algorithm::algorithm::Algorithm;
 use crate::algorithm::algorithm::{Rasterized, Staggered};
 
-#[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Data, Lens)]
+#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens)]
 pub struct Constraints {
     portrait: bool,
     landscape: bool,
     transboundary: bool,
+    budget: f64,
 }
 
 impl Constraints {
-    pub fn new(portrait: bool, landscape: bool, transboundary: bool) -> Self {
-        Constraints { portrait, landscape, transboundary }
+    pub fn new(portrait: bool, landscape: bool, transboundary: bool, budget: f64) -> Self {
+        Constraints { portrait, landscape, transboundary, budget }
     }
 
     pub fn set_portrait(&mut self, portrait: bool) {
@@ -28,6 +29,10 @@ impl Constraints {
         self.transboundary = transboundary;
     }
 
+    pub fn set_budget(&mut self, budget: f64) {
+        self.budget = budget;
+    }
+
     pub fn get_portrait(&self) -> bool {
         self.portrait
     }
@@ -38,6 +43,10 @@ impl Constraints {
 
     pub fn get_transboundary(&self) -> bool {
         self.transboundary
+    }
+
+    pub fn get_budget(&self) -> f64 {
+        self.budget
     }
 
     pub fn get_orientations(&self) -> Vector<Orientation> {
@@ -52,11 +61,10 @@ impl Constraints {
     }
 
     pub fn get_algorithms(self) -> Vec<Box<dyn Algorithm>> {
-        let mut vector: Vec<Box<dyn Algorithm>> = Vec::new();
-        vector.push(Box::new(Rasterized {}));
         if self.transboundary {
-            vector.push(Box::new(Staggered {}));
+            vec![Box::new(Staggered {})]
+        } else {
+            vec![Box::new(Rasterized {})]
         }
-        vector
     }
 }

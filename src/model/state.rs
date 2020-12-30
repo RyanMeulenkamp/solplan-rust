@@ -95,10 +95,11 @@ impl State {
                 .into_iter()
                 .map(move |panel| self.plan(&algorithm, panel))
                 .filter(|plan| plan.get_total_panels() > 0)
+                .filter(|plan| plan.get_total_price() <= self.constraints.get_budget())
             )
             .collect::<Vec<Plan>>();
         plans.sort();
         plans.dedup();
-        Vector::from(plans)
+        Vector::from(plans.into_iter().take(10).collect::<Vec<Plan>>())
     }
 }

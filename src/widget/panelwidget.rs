@@ -1,10 +1,11 @@
 use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, theme};
-use druid::widget::{Flex, Label, TextBox, Scroll, List, Button, Checkbox};
+use druid::widget::{Flex, Label, TextBox, Scroll, List, Button, Checkbox, Either};
 use crate::format::siformatter::SiFormatter;
 use crate::model::panel::Panel;
 use druid::widget::CrossAxisAlignment::Baseline;
 use druid::im::Vector;
 use crate::model::state::State;
+use crate::format::currencyformatter::CurrencyFormatter;
 
 struct PanelGraphics;
 
@@ -35,7 +36,7 @@ impl Widget<Panel> for PanelGraphics {
         _env: &Env,
     ) -> Size {
         if bc.is_width_bounded() | bc.is_height_bounded() {
-            bc.constrain(Size::new(120.0, 80.0))
+            bc.constrain(Size::new(150.0, 110.0))
         } else {
             bc.max()
         }
@@ -59,6 +60,7 @@ fn create_panel_forms_widget() -> impl Widget<Panel> {
         .with_child(
             Flex::row()
                 .cross_axis_alignment(Baseline)
+                .with_default_spacer()
                 .with_child(Label::new("Width"))
                 .with_default_spacer()
                 .with_child(
@@ -91,6 +93,18 @@ fn create_panel_forms_widget() -> impl Widget<Panel> {
                         .lens(Panel::peak_power)
                 )
         )
+        .with_default_spacer()
+        .with_child(
+            Flex::row()
+                .cross_axis_alignment(Baseline)
+                .with_child(Label::new("Price"))
+                .with_default_spacer()
+                .with_child(
+                    TextBox::new()
+                        .with_formatter(CurrencyFormatter::EUROS)
+                        .lens(Panel::price)
+                )
+        )
 }
 
 fn create_single_panel_widget() -> impl Widget<Panel> {
@@ -98,11 +112,12 @@ fn create_single_panel_widget() -> impl Widget<Panel> {
         .with_default_spacer()
         .with_child(
             Flex::row()
+                .with_default_spacer()
                 .with_child(Label::new("Type"))
                 .with_default_spacer()
                 .with_child(
                     TextBox::new()
-                        .fix_width(218.0)
+                        .fix_width(240.0)
                         .lens(Panel::name)
                 )
                 .with_default_spacer()
@@ -118,40 +133,45 @@ fn create_single_panel_widget() -> impl Widget<Panel> {
             Flex::row()
                 .with_child(create_panel_forms_widget())
                 .with_default_spacer()
-                .with_child(PanelGraphics {}.fix_size(120.0, 80.0))
+                .with_flex_child(PanelGraphics {}, 1.0)
+                .with_default_spacer()
         )
         .with_default_spacer()
         .border(theme::PLACEHOLDER_COLOR, 0.5)
         .fix_width(340.0)
 }
 
-pub fn create_add_remove_widget() -> impl Widget<State> {
+pub fn create_controls_widget() -> impl Widget<State> {
     Flex::row()
-        .with_flex_child(
+        .with_child(
             Button::new("Add")
                 .on_click(|_ctx, data: &mut State, _env| {
                     let mut panels = data.get_panels().clone();
                     panels.insert(0, Panel::new(
-                        "type", 1684.0, 1002.0, 335.0
+                        "type", 1684.0, 1002.0, 335.0, 100.0
                     ));
                     data.set_panels(panels);
                 }),
-            1.0
         )
-        .with_flex_child(
-            Button::new("Del")
-                .on_click(|_ctx, data: &mut State, _env| {
-                    let mut new_data: Vector<Panel> = Vector::new();
-                    for panel in data.get_panels().iter() {
-                        if !panel.is_selected() {
-                            new_data.push_back(panel.clone());
+        .with_flex_spacer(1.0)
+        .with_child(
+            Either::new(
+                |state: &State, _| state.get_panels().iter().any(|panel| panel.is_selected()),
+                Button::new("Del")
+                    .on_click(|_ctx, data: &mut State, _env| {
+                        let mut new_data: Vector<Panel> = Vector::new();
+                        for panel in data.get_panels().iter() {
+                            if !panel.is_selected() {
+                                new_data.push_back(panel.clone());
+                            }
                         }
-                    }
-                    data.set_panels(new_data);
-                })
-            ,
-            1.0
+                        data.set_panels(new_data);
+                    }),
+                Label::new("Select panels to delete them")
+            )
         )
+        .padding(10.0)
+        .fix_width(340.0)
 }
 
 pub fn create_panels_widget() -> impl Widget<Vector<Panel>> {

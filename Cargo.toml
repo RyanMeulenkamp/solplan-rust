@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-druid = { git = "https://github.com/linebender/druid.git", branch = "value-formatter", features = ["im", "image"] }
+druid = { git = "https://github.com/linebender/druid.git", features = ["im", "image"] }
 wasm-bindgen = "0.2.69"
 console_error_panic_hook = "0.1.6"
 log = "0.4.11"

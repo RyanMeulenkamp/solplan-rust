@@ -84,9 +84,9 @@ pub fn plan() -> impl Widget<Plan> {
         .with_child(
             Label::new(|plan: &Plan, _env: &_|
                 format!(
-                    "{} x {} (Area = {:.2}m²; DC power = {:.1}KWp)",
+                    "{} x {} (Area = {:.2}m²; DC power = {:.1}KWp)  Total est. price: {:.2}€",
                     plan.get_total_panels(), plan.get_panels().get_name(), plan.get_total_area(),
-                    plan.get_total_dc_power() / 1000.0
+                    plan.get_total_dc_power() / 1000.0, plan.get_total_price()
                 )
             )
                 .background(theme::PLACEHOLDER_COLOR)

@@ -91,6 +91,10 @@ impl Plan {
         self.get_total_panels() as f64 * self.panel.get_peak_power()
     }
 
+    pub fn get_total_price(&self) -> f64 {
+        self.get_total_panels() as f64 * self.panel.get_price()
+    }
+
     fn distance(amount: i32, panel: f64, clearance: f64) -> f64 {
         let amount = amount as f64;
         amount * panel + (amount - 1.0) * clearance
