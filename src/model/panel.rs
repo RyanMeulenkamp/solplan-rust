@@ -1,7 +1,8 @@
 use druid::{Data, Lens};
 use crate::model::orientation::Orientation;
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, PartialEq, PartialOrd, Data, Lens)]
+#[derive(Clone, PartialEq, PartialOrd, Data, Lens, Serialize, Deserialize)]
 pub struct Panel {
     name: String,
     width: f64,

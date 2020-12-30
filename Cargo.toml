@@ -9,6 +9,10 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 druid = { git = "https://github.com/linebender/druid.git", features = ["im", "image"] }
+im = { version = "*", features = ["serde"] }
+serde = { version = "1.0.118", features = ["derive"] }
+serde_json = { version = "1.0.61", features = ["alloc"] }
+
 wasm-bindgen = "0.2.69"
 console_error_panic_hook = "0.1.6"
 log = "0.4.11"

@@ -3,8 +3,9 @@ use druid::im::Vector;
 use crate::model::orientation::Orientation;
 use crate::algorithm::algorithm::Algorithm;
 use crate::algorithm::algorithm::{Rasterized, Staggered};
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens)]
+#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens, Serialize, Deserialize)]
 pub struct Constraints {
     portrait: bool,
     landscape: bool,
@@ -13,7 +14,7 @@ pub struct Constraints {
 }
 
 impl Constraints {
-    pub fn new(portrait: bool, landscape: bool, transboundary: bool, budget: f64) -> Self {
+    pub const fn new(portrait: bool, landscape: bool, transboundary: bool, budget: f64) -> Self {
         Constraints { portrait, landscape, transboundary, budget }
     }
 

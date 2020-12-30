@@ -1,8 +1,9 @@
 use druid::{Data, Lens};
+use serde::{Serialize, Deserialize};
 
 use crate::model::roof::Roof;
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens)]
+#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens, Serialize, Deserialize)]
 pub struct Boundary {
     top: f64,
     bottom: f64,
@@ -15,7 +16,7 @@ impl Eq for Boundary {
 }
 
 impl Boundary {
-    pub fn new(top: f64, bottom: f64, left: f64, right: f64) -> Self {
+    pub const fn new(top: f64, bottom: f64, left: f64, right: f64) -> Self {
         Boundary { top, bottom, left, right }
     }
 

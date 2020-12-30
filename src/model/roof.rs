@@ -1,7 +1,8 @@
 use druid::{Data, Lens};
 use crate::model::boundary::Boundary;
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens)]
+#[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens, Serialize, Deserialize)]
 pub struct Roof {
     ridge: f64,
     eaves: f64,
@@ -13,7 +14,7 @@ impl Eq for Roof {
 }
 
 impl Roof {
-    pub fn new(ridge_width: f64, eaves_width: f64, height: f64) -> Self {
+    pub const fn new(ridge_width: f64, eaves_width: f64, height: f64) -> Self {
         Roof { ridge: ridge_width, eaves: eaves_width, height }
     }
 
