@@ -1,16 +1,19 @@
-use druid::{AppLauncher, Data, LensExt, LocalizedString, theme, Widget, WidgetExt, WindowDesc, AppDelegate, WindowId, Env, DelegateCtx};
+use druid::{
+    AppLauncher, Data, LensExt, LocalizedString, theme, Widget, WidgetExt, WindowDesc, AppDelegate,
+    WindowId, Env, DelegateCtx
+};
 use druid::im::Vector;
 use druid::lens::Identity;
 use druid::widget::{Flex, Label};
 use wasm_bindgen::prelude::*;
 
-use crate::model::plan::Plan;
-use crate::model::state::State;
-use crate::widget::{boundarywidget::create_boundary_widget, roofwidget::create_roof_widget};
-use crate::widget::clearancewidget::create_clearance_widget;
-use crate::widget::constraintswidget::create_constraints_widget;
-use crate::widget::panelwidget::{create_controls_widget, create_panels_widget};
-use crate::widget::planwidget::create_plan_widget;
+use crate::model::{plan::Plan, state::State};
+use crate::widget::{
+    boundarywidget::create_boundary_widget, roofwidget::create_roof_widget,
+    clearancewidget::create_clearance_widget, constraintswidget::create_constraints_widget,
+    panelwidget::{create_controls_widget, create_panels_widget},
+    planwidget::create_plan_widget
+};
 use crate::util::configuration::{write_config, read_config};
 
 pub mod format;
@@ -29,7 +32,7 @@ fn input_widget<T: Data>(title: &str, child: impl Widget<T> + 'static) -> impl W
         )
         .with_child(
             child
-                .padding(10.0)
+                .padding((10.0, 10.0, 10.0, 0.0))
                 .border(theme::PLACEHOLDER_COLOR, 1.5)
         )
 }
@@ -40,30 +43,14 @@ fn build_app() -> impl Widget<State> {
         .with_child(
             Flex::column()
                 .with_default_spacer()
-                .with_child(input_widget(
-                    "Roof",
-                    create_roof_widget()
-                        .lens(State::roof)
-                ))
-                .with_child(input_widget(
-                    "Boundary",
-                    create_boundary_widget()
-                ))
+                .with_child(input_widget("Roof", create_roof_widget().lens(State::roof)))
+                .with_child(input_widget("Boundary", create_boundary_widget()))
                 .with_default_spacer()
                 .with_child(
-                    Label::new("Panels")
-                        .background(theme::PLACEHOLDER_COLOR)
-                        .expand_width()
+                    Label::new("Panels").background(theme::PLACEHOLDER_COLOR).expand_width()
                 )
-                .with_child(
-                    create_controls_widget()
-                        .border(theme::PLACEHOLDER_COLOR, 1.5),
-                )
-                .with_flex_child(
-                    create_panels_widget()
-                        .border(theme::PLACEHOLDER_COLOR, 1.5),
-                    1.0
-                )
+                .with_child(create_controls_widget().border(theme::PLACEHOLDER_COLOR, 1.5))
+                .with_flex_child(create_panels_widget().border(theme::PLACEHOLDER_COLOR, 1.5), 1.0)
                 .with_child(input_widget(
                     "Clearance",
                     create_clearance_widget()

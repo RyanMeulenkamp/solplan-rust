@@ -39,26 +39,6 @@ impl Plan {
         Plan { roof, boundary, panel, clearance, layout }
     }
 
-    pub fn set_roof(&mut self, roof: Roof) {
-        self.roof = roof;
-    }
-
-    pub fn set_boundary(&mut self, boundary: Boundary) {
-        self.boundary = boundary;
-    }
-
-    pub fn set_panel(&mut self, panel: Panel) {
-        self.panel = panel;
-    }
-
-    pub fn set_clearance(&mut self, clearance: Clearance) {
-        self.clearance = clearance;
-    }
-
-    pub fn set_layout(&mut self, layout: Vector<i32>) {
-        self.layout = layout;
-    }
-
     pub fn get_roof(&self) -> Roof {
         self.roof
     }
@@ -84,7 +64,10 @@ impl Plan {
     }
 
     pub fn get_total_area(&self) -> f64 {
-        self.get_total_panels() as f64 * self.panel.get_height() * self.panel.get_width() / 1_000_000.0
+        self.get_total_panels() as f64
+            * self.panel.get_height()
+            * self.panel.get_width()
+            / 1_000_000.0
     }
 
     pub fn get_total_dc_power(&self) -> f64 {
@@ -101,7 +84,10 @@ impl Plan {
     }
 
     pub fn height(&self) -> f64 {
-        Plan::distance(self.get_layout().len() as i32, self.panel.get_height(), self.clearance.get_horizontal())
+        Plan::distance(
+            self.get_layout().len() as i32, self.panel.get_height(),
+            self.clearance.get_horizontal()
+        )
     }
 
     pub fn width_at(&self, row: usize) -> f64 {

@@ -18,36 +18,6 @@ impl Roof {
         Roof { ridge: ridge_width, eaves: eaves_width, height }
     }
 
-    pub fn slope(&self) -> f64 {
-        (self.eaves - self.ridge) / self.height
-    }
-
-    pub fn width_at(&self, height: f64) -> f64 {
-        self.eaves - height * self.slope()
-    }
-
-    pub fn perpendicular_to_horizontal(&self, perpendicular_boundary: f64) -> f64 {
-        let y = (self.eaves - self.ridge) * 0.5;
-        perpendicular_boundary / y.atan2(self.height).cos()
-    }
-
-    pub fn horizontal_shift(&self, boundary: Boundary) -> f64 {
-        self.perpendicular_to_horizontal(boundary.get_left() - boundary.get_right())
-    }
-
-    pub fn effective_roof(&self, boundary: Boundary) -> Roof {
-        let clearance = self.perpendicular_to_horizontal(boundary.get_left() + boundary.get_right());
-        Roof::new(
-            self.width_at(self.height - boundary.get_top()) - clearance,
-            self.width_at(boundary.get_bottom()) - clearance,
-            self.height - boundary.get_top() - boundary.get_bottom()
-        )
-    }
-
-    pub fn half(&self) -> Roof {
-        Roof::new(self.ridge * 0.5, self.eaves * 0.5, self.height)
-    }
-
     pub fn get_ridge(&self) -> f64 {
         self.ridge
     }
@@ -60,19 +30,39 @@ impl Roof {
         self.height
     }
 
-    pub fn set_ridge(&mut self, ridge_width: f64) {
-        self.ridge = ridge_width;
+    pub fn slope(&self) -> f64 {
+        (self.get_eaves() - self.get_ridge()) / self.get_height()
     }
 
-    pub fn set_eaves(&mut self, eaves_width: f64) {
-        self.eaves = eaves_width;
+    pub fn width_at(&self, height: f64) -> f64 {
+        self.get_eaves() - height * self.slope()
     }
 
-    pub fn set_height(&mut self, height: f64) {
-        self.height = height;
+    pub fn perpendicular_to_horizontal(&self, perpendicular_boundary: f64) -> f64 {
+        let y = (self.get_eaves() - self.get_ridge()) * 0.5;
+        perpendicular_boundary / y.atan2(self.get_height()).cos()
+    }
+
+    pub fn horizontal_boundary(&self, boundary: Boundary) -> f64 {
+        self.perpendicular_to_horizontal(boundary.get_left() - boundary.get_right())
+    }
+
+    pub fn effective_roof(&self, boundary: Boundary) -> Roof {
+        let clearance = self.perpendicular_to_horizontal(
+            boundary.get_left() + boundary.get_right()
+        );
+        Roof::new(
+            self.width_at(self.get_height() - boundary.get_top()) - clearance,
+            self.width_at(boundary.get_bottom()) - clearance,
+            self.get_height() - boundary.get_top() - boundary.get_bottom()
+        )
+    }
+
+    pub fn half(&self) -> Roof {
+        Roof::new(self.get_ridge() * 0.5, self.get_eaves() * 0.5, self.get_height())
     }
 
     pub fn aspect_ratio(&self) -> f64 {
-        self.height / self.eaves
+        self.get_height() / self.get_eaves()
     }
 }

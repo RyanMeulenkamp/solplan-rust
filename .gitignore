@@ -13,3 +13,7 @@ Cargo.lock
 # IntelliJ Idea files
 .idea
 solplan.iml
+
+# State saved after closing the application
+/conf/state.conf
+

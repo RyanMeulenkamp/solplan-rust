@@ -16,31 +16,11 @@ impl PlanGraphics {
 }
 
 impl Widget<Plan> for PlanGraphics {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut Plan, _env: &Env) {
+    fn event(&mut self, _: &mut EventCtx, _: &Event, _: &mut Plan, _: &Env) {}
+    fn lifecycle(&mut self, _: &mut LifeCycleCtx, _: &LifeCycle, _: &Plan, _: &Env) {}
+    fn update(&mut self, _: &mut UpdateCtx, _: &Plan, _: &Plan, _: &Env) {}
 
-    }
-
-    fn lifecycle(
-        &mut self,
-        _ctx: &mut LifeCycleCtx,
-        _event: &LifeCycle,
-        _data: &Plan,
-        _env: &Env,
-    ) {
-
-    }
-
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &Plan, _data: &Plan, _env: &Env) {
-
-    }
-
-    fn layout(
-        &mut self,
-        _layout_ctx: &mut LayoutCtx,
-        bc: &BoxConstraints,
-        plan: &Plan,
-        _env: &Env,
-    ) -> Size {
+    fn layout(&mut self, _: &mut LayoutCtx, bc: &BoxConstraints, plan: &Plan, _: &Env) -> Size {
         if bc.is_width_bounded() | bc.is_height_bounded() {
             bc.constrain_aspect_ratio(plan.get_roof().aspect_ratio(), bc.max().width)
         } else {
@@ -60,11 +40,14 @@ impl Widget<Plan> for PlanGraphics {
         let clearance = plan.get_clearance().scaled(scale);
 
         let panel_shape = panel.shape();
-        let start_y = (size.height - roof.get_height()) * 0.5 + roof.get_height() - boundary.get_bottom() - panel.get_height();
+        let start_y = (size.height - roof.get_height()) * 0.5
+            + roof.get_height()
+            - boundary.get_bottom()
+            - panel.get_height();
 
         for (row, cols) in plan.get_layout().iter().rev().map(|row| *row as f64).enumerate() {
             let width = cols * panel.get_width() + (cols - 1.0) * clearance.get_vertical();
-            let start_x = (size.width - width + roof.horizontal_shift(boundary)) * 0.5;
+            let start_x = (size.width - width + roof.horizontal_boundary(boundary)) * 0.5;
             for col in 0..cols as i32 {
                 let col = col as f64;
                 ctx.fill(

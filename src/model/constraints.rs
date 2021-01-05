@@ -1,8 +1,12 @@
 use druid::{Data, Lens};
 use druid::im::Vector;
 use crate::model::orientation::Orientation;
-use crate::algorithm::algorithm::Algorithm;
-use crate::algorithm::algorithm::{Rasterized, Staggered};
+use crate::algorithm::{
+    algorithm::Algorithm,
+    rasterized::Rasterized,
+    staggered::Staggered
+};
+
 use serde::{Serialize, Deserialize};
 
 #[derive(Clone, Copy, PartialEq, PartialOrd, Data, Lens, Serialize, Deserialize)]
@@ -16,22 +20,6 @@ pub struct Constraints {
 impl Constraints {
     pub const fn new(portrait: bool, landscape: bool, transboundary: bool, budget: f64) -> Self {
         Constraints { portrait, landscape, transboundary, budget }
-    }
-
-    pub fn set_portrait(&mut self, portrait: bool) {
-        self.portrait = portrait;
-    }
-
-    pub fn set_landscape(&mut self, landscape: bool) {
-        self.landscape = landscape;
-    }
-
-    pub fn set_transboundary(&mut self, transboundary: bool) {
-        self.transboundary = transboundary;
-    }
-
-    pub fn set_budget(&mut self, budget: f64) {
-        self.budget = budget;
     }
 
     pub fn get_portrait(&self) -> bool {
@@ -63,9 +51,9 @@ impl Constraints {
 
     pub fn get_algorithms(self) -> Vec<Box<dyn Algorithm>> {
         if self.transboundary {
-            vec![Box::new(Staggered {})]
+            vec![Box::new(Staggered::new())]
         } else {
-            vec![Box::new(Rasterized {})]
+            vec![Box::new(Rasterized::new())]
         }
     }
 }

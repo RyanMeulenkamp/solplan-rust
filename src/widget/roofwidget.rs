@@ -1,36 +1,16 @@
 use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, Affine};
 use crate::model::roof::Roof;
-use druid::widget::{Flex, Label, TextBox, MainAxisAlignment};
+use druid::widget::{Flex, MainAxisAlignment};
 use crate::format::siformatter::SiFormatter;
+use crate::widget::common::create_form_element;
 
 struct RoofGraphics;
 
 impl Widget<Roof> for RoofGraphics {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut Roof, _env: &Env) {
-
-    }
-
-    fn lifecycle(
-        &mut self,
-        _ctx: &mut LifeCycleCtx,
-        _event: &LifeCycle,
-        _data: &Roof,
-        _env: &Env,
-    ) {
-
-    }
-
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &Roof, _data: &Roof, _env: &Env) {
-
-    }
-
-    fn layout(
-        &mut self,
-        _layout_ctx: &mut LayoutCtx,
-        bc: &BoxConstraints,
-        _roof: &Roof,
-        _env: &Env,
-    ) -> Size {
+    fn event(&mut self, _: &mut EventCtx, _: &Event, _: &mut Roof, _: &Env) {}
+    fn lifecycle(&mut self, _: &mut LifeCycleCtx, _: &LifeCycle, _: &Roof, _: &Env) {}
+    fn update(&mut self, _: &mut UpdateCtx, _: &Roof, _: &Roof, _: &Env) {}
+    fn layout(&mut self, _: &mut LayoutCtx, bc: &BoxConstraints, _: &Roof, _: &Env) -> Size {
         if bc.is_width_bounded() | bc.is_height_bounded() {
             bc.constrain(Size::new(120.0, 80.0))
         } else {
@@ -38,7 +18,7 @@ impl Widget<Roof> for RoofGraphics {
         }
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, roof: &Roof, _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, roof: &Roof, _: &Env) {
         let size = ctx.size();
         let scaled_roof = roof.scaled_to_size(size);
         let half_spare = (size - Size::new(scaled_roof.get_eaves(), scaled_roof.get_height())) / 2.0;
@@ -54,41 +34,9 @@ impl Widget<Roof> for RoofGraphics {
 fn create_roof_forms_widget() -> impl Widget<Roof> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Ridge"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Roof::ridge)
-                )
-        )
-        .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Eaves"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Roof::eaves)
-                )
-        )
-        .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Height"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Roof::height)
-                )
-        )
+        .with_child(create_form_element("Ridge", SiFormatter::MILLIMETERS, Roof::ridge))
+        .with_child(create_form_element("Eaves", SiFormatter::MILLIMETERS, Roof::eaves))
+        .with_child(create_form_element("Height", SiFormatter::MILLIMETERS, Roof::height))
 }
 
 pub fn create_roof_widget() -> impl Widget<Roof> {

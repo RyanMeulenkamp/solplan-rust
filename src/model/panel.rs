@@ -41,30 +41,6 @@ impl Panel {
         self.selected
     }
 
-    pub fn set_name(&mut self, name: &str) {
-        self.name = name.to_string();
-    }
-
-    pub fn set_width(&mut self, width: f64) {
-        self.width = width;
-    }
-
-    pub fn set_height(&mut self, height: f64) {
-        self.height = height;
-    }
-
-    pub fn set_peak_power(&mut self, peak_power: f64) {
-        self.peak_power = peak_power;
-    }
-
-    pub fn set_price(&mut self, price: f64) {
-        self.price = price;
-    }
-
-    pub fn set_selected(&mut self, selected: bool) {
-        self.selected = selected;
-    }
-
     pub fn is_rectangle(&self) -> bool {
         self.height == self.width
     }
@@ -87,11 +63,11 @@ impl Panel {
         }
     }
 
-    pub fn transpose(&mut self) -> &Self {
-        let new_width = self.height;
-        self.set_height(self.width);
-        self.set_width(new_width);
-        self
+    pub fn with_selection(&self, selected: bool) -> Self {
+        Panel {
+            name: self.name.clone(), width: self.width, height: self.height,
+            peak_power: self.peak_power, price: self.price, selected
+        }
     }
 
     pub fn transposed(&self) -> Self {
@@ -111,27 +87,6 @@ impl Panel {
             self.transposed()
         } else {
             self.clone()
-        }
-    }
-
-    pub fn to_portrait(&mut self) {
-        if self.is_landscape() {
-            self.transpose();
-        }
-    }
-
-    pub fn to_landscape(&mut self) {
-        if self.is_portrait() {
-            self.transpose();
-        }
-    }
-
-    pub fn transpose_to(&mut self, orientation: Orientation) {
-        if orientation == Orientation::RECTANGLE {
-        } else if orientation == Orientation::PORTRAIT {
-            self.to_portrait()
-        } else {
-            self.to_landscape()
         }
     }
 

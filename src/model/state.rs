@@ -106,30 +106,26 @@ impl State {
     }
 
     pub fn get_panel_orientations(&self) -> Vector<Panel> {
-        self.get_panels()
-            .into_iter()
-            .flat_map(|panel| self.get_orientations()
-                .into_iter()
+        self.get_panels().iter()
+            .flat_map(|panel| self.get_orientations().into_iter()
                 .map(move |orientation| panel.transposed_to(orientation)))
             .collect::<Vector<Panel>>()
     }
 
-    fn plan(&self, planner: &Box<dyn Algorithm>, panel: Panel) -> Plan {
+    fn plan(&self, planner: &Box<dyn Algorithm>, panel: &Panel) -> Plan {
         planner.plan(self.get_roof(), self.get_boundary(), &panel, self.get_clearance())
     }
 
     pub fn get_plans(&self) -> Vector<Plan> {
-        let mut plans = self.get_algorithms()
-            .into_iter()
-            .flat_map(|algorithm| self.get_panel_orientations()
-                .into_iter()
-                .map(move |panel| self.plan(&algorithm, panel))
+        let mut plans = self.get_algorithms().iter()
+            .flat_map(|algorithm| self.get_panel_orientations().into_iter()
+                .map(move |panel| self.plan(algorithm, &panel))
                 .filter(|plan| plan.get_total_panels() > 0)
-                .filter(|plan| plan.get_total_price() <= self.constraints.get_budget())
+                .filter(|plan| plan.get_total_price() <= self.get_constraints().get_budget())
             )
             .collect::<Vec<Plan>>();
         plans.sort();
         plans.dedup();
-        Vector::from(plans.into_iter().take(10).collect::<Vec<Plan>>())
+        plans.into_iter().take(10).collect::<Vector<Plan>>()
     }
 }

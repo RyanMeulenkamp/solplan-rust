@@ -20,14 +20,6 @@ impl Boundary {
         Boundary { top, bottom, left, right }
     }
 
-    pub fn effective_roof(&self, roof: Roof) -> Roof {
-        roof.effective_roof(self.clone())
-    }
-
-    pub fn scaled(&self, scale: f64) -> Self {
-        Self::new(self.top * scale, self.bottom * scale, self.left * scale, self.right * scale)
-    }
-
     pub fn get_top(&self) -> f64 {
         self.top
     }
@@ -44,19 +36,11 @@ impl Boundary {
         self.right
     }
 
-    pub fn set_top(&mut self, top: f64) {
-        self.top = top;
+    pub fn effective_roof(&self, roof: Roof) -> Roof {
+        roof.effective_roof(self.clone())
     }
 
-    pub fn set_bottom(&mut self, bottom: f64) {
-        self.bottom = bottom;
-    }
-
-    pub fn set_left(&mut self, left: f64) {
-        self.left = left;
-    }
-
-    pub fn set_right(&mut self, right: f64) {
-        self.right = right;
+    pub fn scaled(&self, scale: f64) -> Self {
+        Self::new(self.top * scale, self.bottom * scale, self.left * scale, self.right * scale)
     }
 }

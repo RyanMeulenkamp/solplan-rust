@@ -6,6 +6,7 @@ impl Roof {
     pub fn scale(&self, size: Size) -> f64 {
         let width_ratio = size.width / self.get_eaves();
         let height_ratio = size.height / self.get_height();
+
         if width_ratio > height_ratio {
             height_ratio
         } else {

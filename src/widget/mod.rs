@@ -4,3 +4,4 @@ pub mod panelwidget;
 pub mod clearancewidget;
 pub mod constraintswidget;
 pub mod planwidget;
+pub mod common;

@@ -23,12 +23,4 @@ impl Clearance {
     pub fn get_horizontal(&self) -> f64 {
         self.horizontal
     }
-
-    pub fn set_vertical(&mut self, vertical: f64) {
-        self.vertical = vertical;
-    }
-
-    pub fn set_horizontal(&mut self, horizontal: f64) {
-        self.horizontal = horizontal;
-    }
 }

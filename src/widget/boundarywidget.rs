@@ -1,39 +1,20 @@
 use druid::{Widget, WidgetExt, EventCtx, Event, Env, LifeCycleCtx, LifeCycle, UpdateCtx, BoxConstraints, LayoutCtx, Size, PaintCtx, Color, RenderContext, Affine, Point, LensExt};
 use crate::model::roof::Roof;
-use druid::widget::{Flex, Label, TextBox, MainAxisAlignment};
+use druid::widget::{Flex, MainAxisAlignment};
 use crate::format::siformatter::SiFormatter;
 use crate::model::boundary::Boundary;
 use crate::model::state::State;
 use druid::lens::Identity;
+use crate::widget::common::create_form_element;
 
 pub struct BoundaryGraphics;
 
 impl Widget<(Roof, Boundary)> for BoundaryGraphics {
-    fn event(&mut self, _ctx: &mut EventCtx, _event: &Event, _data: &mut (Roof, Boundary), _env: &Env) {
+    fn event(&mut self, _: &mut EventCtx, _: &Event, _: &mut (Roof, Boundary), _: &Env) {}
+    fn lifecycle(&mut self, _: &mut LifeCycleCtx, _: &LifeCycle, _: &(Roof, Boundary), _: &Env, ) {}
+    fn update(&mut self, _: &mut UpdateCtx, _: &(Roof, Boundary), _: &(Roof, Boundary), _: &Env) {}
 
-    }
-
-    fn lifecycle(
-        &mut self,
-        _ctx: &mut LifeCycleCtx,
-        _event: &LifeCycle,
-        _data: &(Roof, Boundary),
-        _env: &Env,
-    ) {
-
-    }
-
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &(Roof, Boundary), _data: &(Roof, Boundary), _env: &Env) {
-
-    }
-
-    fn layout(
-        &mut self,
-        _layout_ctx: &mut LayoutCtx,
-        bc: &BoxConstraints,
-        _data: &(Roof, Boundary),
-        _env: &Env,
-    ) -> Size {
+    fn layout(&mut self, _: &mut LayoutCtx, bc: &BoxConstraints, _: &(Roof, Boundary), _: &Env) -> Size {
         if bc.is_width_bounded() | bc.is_height_bounded() {
             let size = Size::new(120.0, 80.0);
             bc.constrain(size)
@@ -42,7 +23,7 @@ impl Widget<(Roof, Boundary)> for BoundaryGraphics {
         }
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, tuple: &(Roof, Boundary), _env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, tuple: &(Roof, Boundary), _: &Env) {
         let size = ctx.size();
         let scale = tuple.0.scale(size);
         let roof = tuple.0.scaled(scale);
@@ -58,7 +39,7 @@ impl Widget<(Roof, Boundary)> for BoundaryGraphics {
         effective_roof_path.apply_affine(Affine::translate(half_effective_roof_spare.to_vec2() * 0.5));
 
         let boundary_shift = Point::new(
-            roof.horizontal_shift(tuple.1), tuple.1.get_top() - tuple.1.get_bottom()
+            roof.horizontal_boundary(tuple.1), tuple.1.get_top() - tuple.1.get_bottom()
         );
         effective_roof_path.apply_affine(Affine::translate(boundary_shift.to_vec2() * scale * 0.5));
 
@@ -70,45 +51,10 @@ impl Widget<(Roof, Boundary)> for BoundaryGraphics {
 fn create_boundary_forms_widget() -> impl Widget<Boundary> {
     Flex::column()
         .cross_axis_alignment(druid::widget::CrossAxisAlignment::End)
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Top"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Boundary::top)))
-        .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Left"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Boundary::left)))
-        .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Right"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Boundary::right)))
-        .with_default_spacer()
-        .with_child(
-            Flex::row()
-                .cross_axis_alignment(druid::widget::CrossAxisAlignment::Baseline)
-                .with_child(Label::new("Bottom"))
-                .with_default_spacer()
-                .with_child(
-                    TextBox::new()
-                        .with_formatter(SiFormatter::MILLIMETERS)
-                        .lens(Boundary::bottom)))
+        .with_child(create_form_element("Top", SiFormatter::MILLIMETERS, Boundary::top))
+        .with_child(create_form_element("Left", SiFormatter::MILLIMETERS, Boundary::left))
+        .with_child(create_form_element("Right", SiFormatter::MILLIMETERS, Boundary::right))
+        .with_child(create_form_element("Bottom", SiFormatter::MILLIMETERS, Boundary::bottom))
 }
 
 pub fn create_boundary_widget() -> impl Widget<State> {
@@ -117,6 +63,7 @@ pub fn create_boundary_widget() -> impl Widget<State> {
         .with_default_spacer()
         .with_child(
             BoundaryGraphics {}
+                .padding((0.0, 0.0, 0.0, 10.0))
                 .fix_size(120.0, 80.0)
                 .lens(Identity.map(
                     |state: &State| (state.get_roof(), state.get_boundary()),

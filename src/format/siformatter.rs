@@ -56,7 +56,10 @@ impl Formatter<f64> for SiFormatter {
         if !value.is_normal() {
             format!("0{}0{}", self.decimal_separator, self.unit_symbol)
         } else {
-            format!("{}{}{}{}", *value as i32, self.decimal_separator, (value % 1.0) as i32, self.unit_symbol)
+            format!(
+                "{}{}{}{}", *value as i32, self.decimal_separator, (value % 1.0) as i32,
+                self.unit_symbol
+            )
         }
     }
 
@@ -75,12 +78,11 @@ impl Formatter<f64> for SiFormatter {
             .bytes()
             .rposition(|b| b as char == self.decimal_separator);
         let (major, minor) = input.split_at(decimal_pos.unwrap_or_else(|| input.len()));
-        let canonical: String = major
+        major
             .chars()
             .chain(Some('.'))
             .chain(minor.chars().skip(1))
-            .collect();
-        canonical
+            .collect::<String>()
             .parse()
             .map_err(|err| ValidationError::new(DistanceValidationError::Parse(err)))
     }
