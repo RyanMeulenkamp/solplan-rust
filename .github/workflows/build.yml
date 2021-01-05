@@ -1,0 +1,50 @@
+name: Build/Deploy
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v2.3.4
+        with:
+          token: ${{ secrets.CI_PAT }}
+      - name: Caching reusable stuff
+        uses: actions/cache@v2
+        with:
+          path: |
+            target
+            ~/.cargo/
+          key: generic
+      - name: Get gh-pages branch
+        run: git pull && git checkout gh-pages && git pull && git checkout main
+      - name: Update source on gh-pages
+        run: git branch -D gh-pages && git checkout -b gh-pages
+
+      - name: Install rust
+        uses: actions-rs/toolchain@master
+        with:
+          toolchain: nightly
+          override: true
+      - name: Update dependencies
+        run: cargo update
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          version: 'latest'
+      - name: Package web assembly
+        run: wasm-pack build --target web
+      - name: config for commiting/pushing
+        run: git config --global user.email "ryanmeulenkamp@gmail.com" && git config --global user.name "Github Actions"
+      - name: Deploy wasm to Github pages
+        run: git add -f pkg && git commit --amend --no-edit && git push -u origin gh-pages --force-with-lease
+      - name: Check pkg dir
+        run: ls -lAh . && ls -lAh pkg && git status
+

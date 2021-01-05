@@ -1,0 +1,15 @@
+{
+  "name": "solplan",
+  "collaborators": [
+    "Ryan Meulenkamp <Ryan.Meulenkamp@Nedap.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "solplan_bg.wasm",
+    "solplan.js",
+    "solplan.d.ts"
+  ],
+  "module": "solplan.js",
+  "types": "solplan.d.ts",
+  "sideEffects": false
+}
